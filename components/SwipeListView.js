@@ -112,8 +112,8 @@ class SwipeListView extends Component {
 					leftOpenValue={item.leftOpenValue || this.props.leftOpenValue}
 					rightOpenValue={item.rightOpenValue || this.props.rightOpenValue}
 					closeOnRowPress={item.closeOnRowPress || this.props.closeOnRowPress}
-					disableLeftSwipe={true}
-					disableRightSwipe={item.disableRightSwipe || this.props.disableRightSwipe}
+					disableLeftSwipe={false}
+					disableRightSwipe={true}
 					stopLeftSwipe={item.stopLeftSwipe || this.props.stopLeftSwipe}
 					stopRightSwipe={item.stopRightSwipe || this.props.stopRightSwipe}
 					recalculateHiddenLayout={this.props.recalculateHiddenLayout}
