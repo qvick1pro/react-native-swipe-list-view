@@ -44,6 +44,7 @@ class SwipeRow extends Component {
 			hiddenWidth: 0
 		};
 		this._translateX = new Animated.Value(0);
+		this._controlTranslateX = new Animated.Value(0);
 	}
 
 	componentWillMount() {
@@ -61,9 +62,15 @@ class SwipeRow extends Component {
 	}
 
 	getPreviewAnimation(toValue, delay) {
-		return Animated.timing(
-			this._translateX,
-			{ duration: this.props.previewDuration, toValue, delay }
+		return Animated.parallel(
+			Animated.timing(
+				this._translateX,
+				{ duration: this.props.previewDuration, toValue, delay }
+			),
+			Animated.timing(
+				this._controlTranslateX,
+				{ duration: this.props.previewDuration, toValue: (toValue >= this.props.rightOpenValue) ? toValue : this.props.rightOpenValue, delay }
+			),
 		);
 	}
 
@@ -138,6 +145,7 @@ class SwipeRow extends Component {
 			if (this.props.stopRightSwipe && newDX < this.props.stopRightSwipe) { newDX = this.props.stopRightSwipe; }
 
 			this._translateX.setValue(newDX);
+			this._controlTranslateX.setValue((newDX >= this.props.rightOpenValue) ? newDX : this.props.rightOpenValue);
 
 		}
 	}
@@ -199,6 +207,14 @@ class SwipeRow extends Component {
 	}
 
 	manuallySwipeRow(toValue) {
+		Animated.spring(
+			this._controlTranslateX,
+			{
+				toValue: (toValue >= this.props.rightOpenValue) ? toValue : this.props.rightOpenValue,
+				friction: this.props.friction,
+				tension: this.props.tension,
+			}
+		).start();
 		Animated.spring(
 			this._translateX,
 			{
@@ -293,15 +309,20 @@ class SwipeRow extends Component {
 	render() {
 		return (
 			<View style={this.props.style ? this.props.style : styles.container}>
-				<View style={[
+				<Animated.View style={[
 					styles.hidden,
 					{
 						height: this.state.hiddenHeight,
 						width: this.state.hiddenWidth,
+						transform: [
+							{
+								translateX: this._controlTranslateX,
+							}
+						]
 					}
 				]}>
 					{this.props.children[0]}
-				</View>
+				</Animated.View>
 				{this.renderRowContent()}
 			</View>
 		);
@@ -313,11 +334,12 @@ const styles = StyleSheet.create({
 	container: {
 		// As of RN 0.29 flex: 1 is causing all rows to be the same height
 		// flex: 1
+		position: 'relative',
 	},
 	hidden: {
 		zIndex: 1,
 		bottom: 0,
-		left: 0,
+		left: '100%',
 		overflow: 'hidden',
 		position: 'absolute',
 		right: 0,
