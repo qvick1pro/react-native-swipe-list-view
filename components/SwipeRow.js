@@ -247,9 +247,9 @@ class SwipeRow extends Component {
 		const onPress = this.props.children[1].props.onPress;
 
 		if (onPress) {
-			const newOnPress = _ => {
-				this.onRowPress();
-				onPress();
+			const newOnPress = (..._) => {
+				this.onRowPress(..._);
+				onPress(..._);
 			}
 			return React.cloneElement(
 				this.props.children[1],
